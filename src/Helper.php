@@ -4,7 +4,13 @@ namespace Omnipay\WechatPay;
 
 class Helper
 {
-    public static function array2xml($arr, $root = 'xml')
+
+    /**
+     * @param array $arr
+     * @param string $root
+     * @return string
+     */
+    public static function array2xml(array $arr, string $root = 'xml'): string
     {
         $xml = "<$root>";
         foreach ($arr as $key => $val) {
@@ -19,30 +25,45 @@ class Helper
         return $xml;
     }
 
-
-    public static function xml2array($xml)
+    /**
+     * @param string $xml
+     * @return array
+     */
+    public static function xml2array(string $xml): array
     {
         libxml_disable_entity_loader(true);
 
         $data = json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
 
-        if (! is_array($data)) {
+        if (!is_array($data)) {
             $data = [];
         }
 
         return $data;
     }
 
-
-    public static function sign($data, $key)
+    /**
+     * @param array $data
+     * @param string $key
+     * @return string
+     */
+    public static function sign(array $data, string $key): string
     {
+        $data = array_filter($data);
+
         unset($data['sign']);
 
         ksort($data);
 
-        $query = urldecode(http_build_query($data));
-        $query .= "&key={$key}";
+        $result = urldecode(http_build_query($data));
+        $result .= "&key={$key}";
 
-        return strtoupper(md5($query));
+        if (($data['sign_type'] ?? 'MD5') === 'MD5') {
+            $result = md5($result);
+        } else {
+            $result = hash_hmac('sha256', $result, $key);
+        }
+
+        return strtoupper($result);
     }
 }

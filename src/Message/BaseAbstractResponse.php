@@ -14,12 +14,12 @@ abstract class BaseAbstractResponse extends AbstractResponse
     /**
      * Is the response successful?
      *
-     * @return boolean
+     * @return bool
      */
-    public function isSuccessful()
+    public function isSuccessful(): bool
     {
         $data = $this->getData();
 
-        return isset($data['result_code']) && $data['result_code'] == 'SUCCESS';
+        return isset($data['result_code']) && $data['result_code'] === 'SUCCESS';
     }
 }

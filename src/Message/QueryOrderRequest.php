@@ -3,6 +3,7 @@
 namespace Omnipay\WechatPay\Message;
 
 use Omnipay\Common\Exception\InvalidRequestException;
+use Omnipay\Common\Http\Exception\{NetworkException, RequestException};
 use Omnipay\Common\Message\ResponseInterface;
 use Omnipay\WechatPay\Helper;
 
@@ -21,14 +22,15 @@ class QueryOrderRequest extends BaseAbstractRequest
     /**
      * Get the raw data array for this message. The format of this varies from gateway to
      * gateway, but will usually be either an associative array, or a SimpleXMLElement.
-     * @return mixed
+     *
+     * @return array
      * @throws InvalidRequestException
      */
-    public function getData()
+    public function getData(): array
     {
         $this->validate('app_id', 'mch_id');
 
-        if (! $this->getTransactionId() && ! $this->getOutTradeNo()) {
+        if (!$this->getTransactionId() && !$this->getOutTradeNo()) {
             throw new InvalidRequestException("The 'transaction_id' or 'out_trade_no' parameter is required");
         }
 
@@ -42,8 +44,6 @@ class QueryOrderRequest extends BaseAbstractRequest
             'nonce_str'      => md5(uniqid()),
         );
 
-        $data = array_filter($data);
-
         $data['sign'] = Helper::sign($data, $this->getApiKey());
 
         return $data;
@@ -51,32 +51,26 @@ class QueryOrderRequest extends BaseAbstractRequest
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getOutTradeNo()
+    public function getOutTradeNo(): ?string
     {
         return $this->getParameter('out_trade_no');
     }
 
 
     /**
-     * @param mixed $outTradeNo
+     * @return string|null
      */
-    public function setOutTradeNo($outTradeNo)
-    {
-        $this->setParameter('out_trade_no', $outTradeNo);
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getTransactionId()
+    public function getTransactionId(): ?string
     {
         return $this->getParameter('transaction_id');
     }
 
 
+    /**
+     * @param string $transactionId
+     */
     public function setTransactionId($transactionId)
     {
         $this->setParameter('transaction_id', $transactionId);
@@ -84,19 +78,27 @@ class QueryOrderRequest extends BaseAbstractRequest
 
 
     /**
+     * @param string $outTradeNo
+     */
+    public function setOutTradeNo(string $outTradeNo)
+    {
+        $this->setParameter('out_trade_no', $outTradeNo);
+    }
+
+
+    /**
      * Send the request with specified data
      *
-     * @param  mixed $data The data to send
+     * @param mixed $data The data to send
      *
      * @return ResponseInterface
-     * @throws \Psr\Http\Client\Exception\NetworkException
-     * @throws \Psr\Http\Client\Exception\RequestException
+     * @throws NetworkException|RequestException
      */
     public function sendData($data)
     {
-        $body     = Helper::array2xml($data);
+        $body = Helper::array2xml($data);
         $response = $this->httpClient->request('POST', $this->endpoint, [], $body)->getBody();
-        $payload  = Helper::xml2array($response);
+        $payload = Helper::xml2array($response);
 
         return $this->response = new QueryOrderResponse($this, $payload);
     }

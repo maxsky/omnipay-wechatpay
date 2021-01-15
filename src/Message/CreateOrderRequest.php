@@ -2,6 +2,8 @@
 
 namespace Omnipay\WechatPay\Message;
 
+use Omnipay\Common\Exception\InvalidRequestException;
+use Omnipay\Common\Http\Exception\{NetworkException, RequestException};
 use Omnipay\Common\Message\ResponseInterface;
 use Omnipay\WechatPay\Helper;
 
@@ -21,9 +23,10 @@ class CreateOrderRequest extends BaseAbstractRequest
      * Get the raw data array for this message. The format of this varies from gateway to
      * gateway, but will usually be either an associative array, or a SimpleXMLElement.
      *
-     * @return mixed
+     * @return array
+     * @throws InvalidRequestException
      */
-    public function getData()
+    public function getData(): array
     {
         $this->validate(
             'app_id',
@@ -48,6 +51,8 @@ class CreateOrderRequest extends BaseAbstractRequest
             'sub_appid'        => $this->getSubAppId(),
             'sub_mch_id'       => $this->getSubMchId(),
             'device_info'      => $this->getDeviceInfo(),//*
+            'nonce_str'        => md5(uniqid()),//*
+            'sign_type'        => $this->getSignType(),
             'body'             => $this->getBody(),//*
             'detail'           => $this->getDetail(),
             'attach'           => $this->getAttach(),
@@ -61,11 +66,10 @@ class CreateOrderRequest extends BaseAbstractRequest
             'notify_url'       => $this->getNotifyUrl(), //*
             'trade_type'       => $this->getTradeType(), //*
             'limit_pay'        => $this->getLimitPay(),
+            'receipt'          => $this->getReceipt(),
+            'profit_sharing'   => $this->getProfitSharing(),
             'openid'           => $this->getOpenId(),//*(trade_type=JSAPI)
-            'nonce_str'        => md5(uniqid()),//*
         );
-
-        $data = array_filter($data);
 
         $data['sign'] = Helper::sign($data, $this->getApiKey());
 
@@ -74,196 +78,214 @@ class CreateOrderRequest extends BaseAbstractRequest
 
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getTradeType()
+    public function getTradeType(): string
     {
         return $this->getParameter('trade_type');
     }
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getDeviceInfo()
+    public function getDeviceInfo(): ?string
     {
         return $this->getParameter('device_Info');
     }
 
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getBody()
+    public function getBody(): string
     {
         return $this->getParameter('body');
     }
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getDetail()
+    public function getDetail(): ?string
     {
         return $this->getParameter('detail');
     }
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getAttach()
+    public function getAttach(): ?string
     {
         return $this->getParameter('attach');
     }
 
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getOutTradeNo()
+    public function getOutTradeNo(): string
     {
         return $this->getParameter('out_trade_no');
     }
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getFeeType()
+    public function getFeeType(): ?string
     {
         return $this->getParameter('fee_type');
     }
 
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getTotalFee()
+    public function getTotalFee(): int
     {
-        return $this->getParameter('total_fee');
+        return (int)$this->getParameter('total_fee');
     }
 
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getSpbillCreateIp()
+    public function getSpbillCreateIp(): string
     {
         return $this->getParameter('spbill_create_ip');
     }
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getTimeStart()
+    public function getTimeStart(): ?string
     {
         return $this->getParameter('time_start');
     }
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getTimeExpire()
+    public function getTimeExpire(): ?string
     {
         return $this->getParameter('time_expire');
     }
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getGoodsTag()
+    public function getGoodsTag(): ?string
     {
         return $this->getParameter('goods_tag');
     }
 
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getNotifyUrl()
+    public function getNotifyUrl(): string
     {
         return $this->getParameter('notify_url');
     }
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getLimitPay()
+    public function getLimitPay(): ?string
     {
         return $this->getParameter('limit_pay');
     }
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getOpenId()
+    public function getReceipt(): ?string
+    {
+        return $this->getParameter('receipt');
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getProfitSharing(): ?string
+    {
+        return $this->getParameter('profit_sharing');
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getOpenId(): ?string
     {
         return $this->getParameter('open_id');
     }
 
 
     /**
-     * @param mixed $deviceInfo
+     * @param string $deviceInfo
      */
-    public function setDeviceInfo($deviceInfo)
+    public function setDeviceInfo(string $deviceInfo)
     {
         $this->setParameter('device_Info', $deviceInfo);
     }
 
 
     /**
-     * @param mixed $body
+     * @param string $body
      */
-    public function setBody($body)
+    public function setBody(string $body)
     {
         $this->setParameter('body', $body);
     }
 
 
     /**
-     * @param mixed $detail
+     * @param string $detail
      */
-    public function setDetail($detail)
+    public function setDetail(string $detail)
     {
         $this->setParameter('detail', $detail);
     }
 
 
     /**
-     * @param mixed $attach
+     * @param string $attach
      */
-    public function setAttach($attach)
+    public function setAttach(string $attach)
     {
         $this->setParameter('attach', $attach);
     }
 
 
     /**
-     * @param mixed $outTradeNo
+     * @param string $outTradeNo
      */
-    public function setOutTradeNo($outTradeNo)
+    public function setOutTradeNo(string $outTradeNo)
     {
         $this->setParameter('out_trade_no', $outTradeNo);
     }
 
 
     /**
-     * @param mixed $feeType
+     * @param string $feeType
      */
-    public function setFeeType($feeType)
+    public function setFeeType(string $feeType)
     {
         $this->setParameter('fee_type', $feeType);
     }
 
 
     /**
-     * @param mixed $totalFee
+     * @param int|string $totalFee
      */
     public function setTotalFee($totalFee)
     {
@@ -281,32 +303,35 @@ class CreateOrderRequest extends BaseAbstractRequest
 
 
     /**
-     * @param mixed $timeStart
+     * @param string $timeStart
      */
-    public function setTimeStart($timeStart)
+    public function setTimeStart(string $timeStart)
     {
         $this->setParameter('time_start', $timeStart);
     }
 
 
     /**
-     * @param mixed $timeExpire
+     * @param string $timeExpire
      */
-    public function setTimeExpire($timeExpire)
+    public function setTimeExpire(string $timeExpire)
     {
         $this->setParameter('time_expire', $timeExpire);
     }
 
 
     /**
-     * @param mixed $goodsTag
+     * @param string $goodsTag
      */
-    public function setGoodsTag($goodsTag)
+    public function setGoodsTag(string $goodsTag)
     {
         $this->setParameter('goods_tag', $goodsTag);
     }
 
 
+    /**
+     * @param string $notifyUrl
+     */
     public function setNotifyUrl($notifyUrl)
     {
         $this->setParameter('notify_url', $notifyUrl);
@@ -314,27 +339,45 @@ class CreateOrderRequest extends BaseAbstractRequest
 
 
     /**
-     * @param mixed $tradeType
+     * @param string $tradeType
      */
-    public function setTradeType($tradeType)
+    public function setTradeType(string $tradeType)
     {
         $this->setParameter('trade_type', $tradeType);
     }
 
 
     /**
-     * @param mixed $limitPay
+     * @param string $limitPay
      */
-    public function setLimitPay($limitPay)
+    public function setLimitPay(string $limitPay)
     {
         $this->setParameter('limit_pay', $limitPay);
     }
 
 
     /**
-     * @param mixed $openId
+     * @param string $receipt
      */
-    public function setOpenId($openId)
+    public function setReceipt(string $receipt)
+    {
+        $this->setParameter('receipt', $receipt);
+    }
+
+
+    /**
+     * @param string $profitSharing
+     */
+    public function setProfitSharing(string $profitSharing)
+    {
+        $this->setParameter('profit_sharing', $profitSharing);
+    }
+
+
+    /**
+     * @param string $openId
+     */
+    public function setOpenId(string $openId)
     {
         $this->setParameter('open_id', $openId);
     }
@@ -343,17 +386,16 @@ class CreateOrderRequest extends BaseAbstractRequest
     /**
      * Send the request with specified data
      *
-     * @param  mixed $data The data to send
+     * @param mixed $data The data to send
      *
      * @return ResponseInterface
-     * @throws \Psr\Http\Client\Exception\NetworkException
-     * @throws \Psr\Http\Client\Exception\RequestException
+     * @throws NetworkException|RequestException
      */
     public function sendData($data)
     {
-        $body     = Helper::array2xml($data);
+        $body = Helper::array2xml($data);
         $response = $this->httpClient->request('POST', $this->endpoint, [], $body)->getBody();
-        $payload  = Helper::xml2array($response);
+        $payload = Helper::xml2array($response);
 
         return $this->response = new CreateOrderResponse($this, $payload);
     }

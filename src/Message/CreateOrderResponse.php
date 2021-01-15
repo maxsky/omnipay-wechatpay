@@ -8,7 +8,7 @@ use Omnipay\WechatPay\Helper;
  * Class CreateOrderResponse
  *
  * @package Omnipay\WechatPay\Message
- * @link    https://pay.weixin.qq.com/wiki/doc/api/app.php?chapter=9_1
+ * @link    https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_1#5
  */
 class CreateOrderResponse extends BaseAbstractResponse
 {
@@ -19,7 +19,10 @@ class CreateOrderResponse extends BaseAbstractResponse
     protected $request;
 
 
-    public function getAppOrderData()
+    /**
+     * @return array
+     */
+    public function getAppOrderData(): array
     {
         if ($this->isSuccessful()) {
             $data = [
@@ -40,19 +43,25 @@ class CreateOrderResponse extends BaseAbstractResponse
     }
 
 
-    public function getPrepayId()
+    /**
+     * @return string|null
+     */
+    public function getPrepayId(): ?string
     {
         if ($this->isSuccessful()) {
             $data = $this->getData();
 
             return $data['prepay_id'];
-        } else {
-            return null;
         }
+
+        return null;
     }
 
 
-    public function getJsOrderData()
+    /**
+     * @return array
+     */
+    public function getJsOrderData(): array
     {
         if ($this->isSuccessful()) {
             $data = [
@@ -72,26 +81,32 @@ class CreateOrderResponse extends BaseAbstractResponse
     }
 
 
-    public function getCodeUrl()
+    /**
+     * @return string|null
+     */
+    public function getCodeUrl(): ?string
     {
         if ($this->isSuccessful() && $this->request->getTradeType() == 'NATIVE') {
             $data = $this->getData();
 
             return $data['code_url'];
-        } else {
-            return null;
         }
+
+        return null;
     }
 
 
-    public function getMwebUrl()
+    /**
+     * @return string|null
+     */
+    public function getMwebUrl(): ?string
     {
         if ($this->isSuccessful() && $this->request->getTradeType() == 'MWEB') {
             $data = $this->getData();
 
             return $data['mweb_url'];
-        } else {
-            return null;
         }
+
+        return null;
     }
 }

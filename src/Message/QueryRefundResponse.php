@@ -6,7 +6,7 @@ namespace Omnipay\WechatPay\Message;
  * Class QueryRefundResponse
  *
  * @package Omnipay\WechatPay\Message
- * @link    https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_5&index=7
+ * @link    https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_5&index=7#6
  */
 class QueryRefundResponse extends BaseAbstractResponse
 {

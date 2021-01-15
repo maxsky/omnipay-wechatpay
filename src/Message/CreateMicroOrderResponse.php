@@ -8,7 +8,6 @@ use Omnipay\WechatPay\Helper;
  * Class CreateMicroOrderResponse
  *
  * @package Omnipay\WechatPay\Message
- * @link    https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_10&index=1
  */
 class CreateMicroOrderResponse extends BaseAbstractResponse
 {
@@ -18,8 +17,10 @@ class CreateMicroOrderResponse extends BaseAbstractResponse
      */
     protected $request;
 
-
-    public function getOrderData()
+    /**
+     * @return array
+     */
+    public function getOrderData(): array
     {
         if ($this->isSuccessful()) {
             $data = [
@@ -39,23 +40,27 @@ class CreateMicroOrderResponse extends BaseAbstractResponse
         return $data;
     }
 
-
-    public function getPrepayId()
+    /**
+     * @return string|null
+     */
+    public function getPrepayId(): ?string
     {
         if ($this->isSuccessful()) {
             return $this->getData()['prepay_id'];
-        } else {
-            return null;
         }
+
+        return null;
     }
 
-
-    public function getCodeUrl()
+    /**
+     * @return string|null
+     */
+    public function getCodeUrl(): ?string
     {
         if ($this->isSuccessful() && $this->request->getTradeType() == 'NATIVE') {
             return $this->getData()['code_url'];
-        } else {
-            return null;
         }
+
+        return null;
     }
 }

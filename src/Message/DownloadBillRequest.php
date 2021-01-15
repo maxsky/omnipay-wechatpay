@@ -10,7 +10,7 @@ use Omnipay\WechatPay\Helper;
  * Class DownloadBillRequest
  *
  * @package Omnipay\WechatPay\Message
- * @link    https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_8
+ * @link    https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_6&index=8
  * @method  DownloadBillResponse send()
  */
 class DownloadBillRequest extends BaseAbstractRequest
@@ -21,25 +21,25 @@ class DownloadBillRequest extends BaseAbstractRequest
     /**
      * Get the raw data array for this message. The format of this varies from gateway to
      * gateway, but will usually be either an associative array, or a SimpleXMLElement.
-     * @return mixed
+     *
+     * @return array
      * @throws InvalidRequestException
      */
-    public function getData()
+    public function getData(): array
     {
         $this->validate('app_id', 'mch_id', 'bill_date');
 
         $data = array(
-            'appid'       => $this->getAppId(),
-            'mch_id'      => $this->getMchId(),
-            'sub_appid'   => $this->getSubAppId(),
-            'sub_mch_id'  => $this->getSubMchId(),
-            'device_info' => $this->getDeviceInfo(),
-            'bill_date'   => $this->getBillDate(),
-            'bill_type'   => $this->getBillType(),//<>
-            'nonce_str'   => md5(uniqid()),
+            'appid' => $this->getAppId(),
+            'mch_id' => $this->getMchId(),
+            'sub_appid' => $this->getSubAppId(),
+            'sub_mch_id' => $this->getSubMchId(),
+            'nonce_str' => md5(uniqid()),
+            'sign_type' => $this->getSignType(),
+            'bill_date' => $this->getBillDate(),
+            'bill_type' => $this->getBillType(),//<>
+            'tar_type' => $this->getTarType(),//GZIP
         );
-
-        $data = array_filter($data);
 
         $data['sign'] = Helper::sign($data, $this->getApiKey());
 
@@ -48,63 +48,63 @@ class DownloadBillRequest extends BaseAbstractRequest
 
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getDeviceInfo()
-    {
-        return $this->getParameter('device_Info');
-    }
-
-
-    /**
-     * @param mixed $deviceInfo
-     */
-    public function setDeviceInfo($deviceInfo)
-    {
-        $this->setParameter('device_Info', $deviceInfo);
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getBillDate()
+    public function getBillDate(): string
     {
         return $this->getParameter('bill_date');
     }
 
 
     /**
-     * @param mixed $billDate
+     * @return string|null
      */
-    public function setBillDate($billDate)
-    {
-        $this->setParameter('bill_date', $billDate);
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getBillType()
+    public function getBillType(): ?string
     {
         return $this->getParameter('bill_type');
     }
 
 
     /**
-     * @param mixed $billType
+     * @return string|null
      */
-    public function setBillType($billType)
+    public function getTarType(): ?string
     {
-        $this->setParameter('bill_type', $billType);
+        return $this->getParameter('tar_type');
+    }
+
+
+    /**
+     * @param string $billDate
+     */
+    public function setBillDate(string $billDate)
+    {
+        $this->setParameter('bill_date', $billDate);
+    }
+
+
+    /**
+     * @param string $billType
+     */
+    public function setBillType(string $billType)
+    {
+        $this->setParameter('bill_type', strtoupper($billType));
+    }
+
+
+    /**
+     * @param string $tarType
+     */
+    public function setTarType(string $tarType)
+    {
+        $this->setParameter('tar_type', strtoupper($tarType));
     }
 
 
     /**
      * Send the request with specified data
      *
-     * @param  mixed $data The data to send
+     * @param mixed $data The data to send
      *
      * @return ResponseInterface
      */
@@ -116,7 +116,13 @@ class DownloadBillRequest extends BaseAbstractRequest
     }
 
 
-    private function post($url, $data = array(), $timeout = 3)
+    /**
+     * @param string $url
+     * @param array $data
+     * @param int $timeout
+     * @return array
+     */
+    private function post(string $url, array $data = array(), int $timeout = 3): array
     {
         $ch = curl_init($url);
 

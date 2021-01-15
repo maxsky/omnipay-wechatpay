@@ -14,6 +14,10 @@ use Omnipay\WechatPay\Helper;
  */
 class CompletePurchaseRequest extends BaseAbstractRequest
 {
+
+    /**
+     * @param array|string $requestParams
+     */
     public function setRequestParams($requestParams)
     {
         $this->setParameter('request_params', $requestParams);
@@ -23,7 +27,7 @@ class CompletePurchaseRequest extends BaseAbstractRequest
     /**
      * Send the request with specified data
      *
-     * @param  mixed $data The data to send
+     * @param mixed $data The data to send
      *
      * @return ResponseInterface
      */
@@ -54,9 +58,9 @@ class CompletePurchaseRequest extends BaseAbstractRequest
      * Get the raw data array for this message. The format of this varies from gateway to
      * gateway, but will usually be either an associative array, or a SimpleXMLElement.
      *
-     * @return mixed
+     * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         $data = $this->getRequestParams();
 
@@ -68,6 +72,9 @@ class CompletePurchaseRequest extends BaseAbstractRequest
     }
 
 
+    /**
+     * @return array|string
+     */
     public function getRequestParams()
     {
         return $this->getParameter('request_params');

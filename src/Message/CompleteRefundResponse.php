@@ -8,24 +8,32 @@ use Omnipay\Common\Message\AbstractResponse;
  * Class CompleteRefundResponse
  *
  * @package Omnipay\WechatPay\Message
- * @link    https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_16&index=10
  */
 class CompleteRefundResponse extends AbstractResponse
 {
-    public function isSuccessful()
+
+    /**
+     * @return bool
+     */
+    public function isSuccessful(): bool
     {
         return $this->isRefunded();
     }
 
-    public function isRefunded()
+    /**
+     * @return bool
+     */
+    public function isRefunded(): bool
     {
         $data = $this->getData();
 
         return $data['refunded'];
     }
 
-
-    public function isSignMatch()
+    /**
+     * @return bool
+     */
+    public function isSignMatch(): bool
     {
         $data = $this->getData();
 

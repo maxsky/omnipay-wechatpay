@@ -6,7 +6,7 @@ namespace Omnipay\WechatPay\Message;
  * Class ShortenUrlResponse
  *
  * @package Omnipay\WechatPay\Message
- * @link    https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_9&index=8
+ * @link    https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_9#5
  */
 class ShortenUrlResponse extends BaseAbstractResponse
 {

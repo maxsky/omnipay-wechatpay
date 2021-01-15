@@ -3,46 +3,78 @@
 namespace Omnipay\WechatPay;
 
 use Omnipay\Common\AbstractGateway;
+use Omnipay\Common\Message\AbstractRequest;
 
 abstract class BaseAbstractGateway extends AbstractGateway
 {
-    public function setTradeType($tradeType)
+
+    /**
+     * @param string $tradeType
+     */
+    public function setTradeType(string $tradeType)
     {
         $this->setParameter('trade_type', $tradeType);
     }
 
 
-    public function setAppId($appId)
+    /**
+     * @return string|null
+     */
+    public function getTradeType(): ?string
+    {
+        return $this->getParameter('trade_type');
+    }
+
+
+    /**
+     * @param string $appId
+     */
+    public function setAppId(string $appId)
     {
         $this->setParameter('app_id', $appId);
     }
 
 
-    public function getAppId()
+    /**
+     * @return string
+     */
+    public function getAppId(): string
     {
         return $this->getParameter('app_id');
     }
 
 
-    public function setApiKey($apiKey)
+    /**
+     * @param string $apiKey
+     */
+    public function setApiKey(string $apiKey)
     {
         $this->setParameter('api_key', $apiKey);
     }
 
 
-    public function getApiKey()
+    /**
+     * @return string
+     */
+    public function getApiKey(): string
     {
         return $this->getParameter('api_key');
     }
 
 
+    /**
+     * @param int|string $mchId
+     */
     public function setMchId($mchId)
     {
         $this->setParameter('mch_id', $mchId);
     }
 
 
-    public function getMchId()
+    /**
+     * @return string
+     */
+    public function getMchId(): string
     {
         return $this->getParameter('mch_id');
     }
@@ -50,18 +82,18 @@ abstract class BaseAbstractGateway extends AbstractGateway
     /**
      * 子商户id
      *
-     * @return mixed
+     * @return string|null
      */
-    public function getSubMchId()
+    public function getSubMchId(): ?string
     {
         return $this->getParameter('sub_mch_id');
     }
 
 
     /**
-     * @param mixed $subMchId
+     * @param string $mchId
      */
-    public function setSubMchId($mchId)
+    public function setSubMchId(string $mchId)
     {
         $this->setParameter('sub_mch_id', $mchId);
     }
@@ -70,23 +102,27 @@ abstract class BaseAbstractGateway extends AbstractGateway
     /**
      * 子商户 app_id
      *
-     * @return mixed
+     * @return string|null
      */
-    public function getSubAppId()
+    public function getSubAppId(): ?string
     {
         return $this->getParameter('sub_appid');
     }
 
 
     /**
-     * @param mixed $subAppId
+     * @param string $subAppId
      */
-    public function setSubAppId($subAppId)
+    public function setSubAppId(string $subAppId)
     {
         $this->setParameter('sub_appid', $subAppId);
     }
 
-    public function setNotifyUrl($url)
+
+    /**
+     * @param string $url
+     */
+    public function setNotifyUrl(string $url)
     {
         $this->setParameter('notify_url', $url);
     }
@@ -99,36 +135,36 @@ abstract class BaseAbstractGateway extends AbstractGateway
 
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getCertPath()
+    public function getCertPath(): string
     {
         return $this->getParameter('cert_path');
     }
 
 
     /**
-     * @param mixed $certPath
+     * @param string $certPath
      */
-    public function setCertPath($certPath)
+    public function setCertPath(string $certPath)
     {
         $this->setParameter('cert_path', $certPath);
     }
 
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getKeyPath()
+    public function getKeyPath(): string
     {
         return $this->getParameter('key_path');
     }
 
 
     /**
-     * @param mixed $keyPath
+     * @param string $keyPath
      */
-    public function setKeyPath($keyPath)
+    public function setKeyPath(string $keyPath)
     {
         $this->setParameter('key_path', $keyPath);
     }
@@ -137,9 +173,9 @@ abstract class BaseAbstractGateway extends AbstractGateway
     /**
      * @param array $parameters
      *
-     * @return \Omnipay\WechatPay\Message\CreateOrderRequest
+     * @return AbstractRequest
      */
-    public function purchase($parameters = array())
+    public function purchase($parameters = array()): AbstractRequest
     {
         $parameters['trade_type'] = $this->getTradeType();
 
@@ -147,23 +183,23 @@ abstract class BaseAbstractGateway extends AbstractGateway
     }
 
 
-    public function getTradeType()
+    /**
+     * @param array $parameters
+     *
+     * @return AbstractRequest
+     */
+    public function completePurchase($parameters = array()): AbstractRequest
     {
-        return $this->getParameter('trade_type');
+        return $this->createRequest('\Omnipay\WechatPay\Message\CompletePurchaseRequest', $parameters);
     }
 
 
     /**
      * @param array $parameters
      *
-     * @return \Omnipay\WechatPay\Message\CompletePurchaseRequest
+     * @return AbstractRequest
      */
-    public function completePurchase($parameters = array())
-    {
-        return $this->createRequest('\Omnipay\WechatPay\Message\CompletePurchaseRequest', $parameters);
-    }
-
-    public function completeRefund($parameters = array())
+    public function completeRefund($parameters = array()): AbstractRequest
     {
         return $this->createRequest('\Omnipay\WechatPay\Message\CompleteRefundRequest', $parameters);
     }
@@ -172,9 +208,9 @@ abstract class BaseAbstractGateway extends AbstractGateway
     /**
      * @param array $parameters
      *
-     * @return \Omnipay\WechatPay\Message\QueryOrderRequest
+     * @return AbstractRequest
      */
-    public function query($parameters = array())
+    public function query($parameters = array()): AbstractRequest
     {
         return $this->createRequest('\Omnipay\WechatPay\Message\QueryOrderRequest', $parameters);
     }
@@ -183,9 +219,9 @@ abstract class BaseAbstractGateway extends AbstractGateway
     /**
      * @param array $parameters
      *
-     * @return \Omnipay\WechatPay\Message\CloseOrderRequest
+     * @return AbstractRequest
      */
-    public function close($parameters = array())
+    public function close($parameters = array()): AbstractRequest
     {
         return $this->createRequest('\Omnipay\WechatPay\Message\CloseOrderRequest', $parameters);
     }
@@ -194,9 +230,9 @@ abstract class BaseAbstractGateway extends AbstractGateway
     /**
      * @param array $parameters
      *
-     * @return \Omnipay\WechatPay\Message\RefundOrderRequest
+     * @return AbstractRequest
      */
-    public function refund($parameters = array())
+    public function refund($parameters = array()): AbstractRequest
     {
         return $this->createRequest('\Omnipay\WechatPay\Message\RefundOrderRequest', $parameters);
     }
@@ -205,9 +241,9 @@ abstract class BaseAbstractGateway extends AbstractGateway
     /**
      * @param array $parameters
      *
-     * @return \Omnipay\WechatPay\Message\QueryOrderRequest
+     * @return AbstractRequest
      */
-    public function queryRefund($parameters = array())
+    public function queryRefund($parameters = array()): AbstractRequest
     {
         return $this->createRequest('\Omnipay\WechatPay\Message\QueryRefundRequest', $parameters);
     }
@@ -216,9 +252,9 @@ abstract class BaseAbstractGateway extends AbstractGateway
     /**
      * @param array $parameters
      *
-     * @return \Omnipay\WechatPay\Message\PromotionTransferRequest
+     * @return AbstractRequest
      */
-    public function transfer($parameters = array())
+    public function transfer($parameters = array()): AbstractRequest
     {
         return $this->createRequest('\Omnipay\WechatPay\Message\PromotionTransferRequest', $parameters);
     }
@@ -227,9 +263,9 @@ abstract class BaseAbstractGateway extends AbstractGateway
     /**
      * @param array $parameters
      *
-     * @return \Omnipay\WechatPay\Message\QueryTransferRequest
+     * @return AbstractRequest
      */
-    public function queryTransfer($parameters = array())
+    public function queryTransfer($parameters = array()): AbstractRequest
     {
         return $this->createRequest('\Omnipay\WechatPay\Message\QueryTransferRequest', $parameters);
     }
@@ -238,9 +274,9 @@ abstract class BaseAbstractGateway extends AbstractGateway
     /**
      * @param array $parameters
      *
-     * @return \Omnipay\WechatPay\Message\DownloadBillRequest
+     * @return AbstractRequest
      */
-    public function downloadBill($parameters = array())
+    public function downloadBill($parameters = array()): AbstractRequest
     {
         return $this->createRequest('\Omnipay\WechatPay\Message\DownloadBillRequest', $parameters);
     }

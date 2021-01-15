@@ -21,10 +21,11 @@ class QueryTransferRequest extends BaseAbstractRequest
     /**
      * Get the raw data array for this message. The format of this varies from gateway to
      * gateway, but will usually be either an associative array, or a SimpleXMLElement.
-     * @return mixed
+     *
+     * @return array
      * @throws InvalidRequestException
      */
-    public function getData()
+    public function getData(): array
     {
         $this->validate('app_id', 'mch_id', 'partner_trade_no', 'cert_path', 'key_path');
 
@@ -35,8 +36,6 @@ class QueryTransferRequest extends BaseAbstractRequest
             'nonce_str'        => md5(uniqid()),
         );
 
-        $data = array_filter($data);
-
         $data['sign'] = Helper::sign($data, $this->getApiKey());
 
         return $data;
@@ -44,54 +43,54 @@ class QueryTransferRequest extends BaseAbstractRequest
 
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getPartnerTradeNo()
+    public function getPartnerTradeNo(): string
     {
         return $this->getParameter('partner_trade_no');
     }
 
 
     /**
-     * @param mixed $partnerTradeNo
+     * @param string $partnerTradeNo
      */
-    public function setPartnerTradeNo($partnerTradeNo)
+    public function setPartnerTradeNo(string $partnerTradeNo)
     {
         $this->setParameter('partner_trade_no', $partnerTradeNo);
     }
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getCertPath()
+    public function getCertPath(): ?string
     {
         return $this->getParameter('cert_path');
     }
 
 
     /**
-     * @param mixed $certPath
+     * @param string $certPath
      */
-    public function setCertPath($certPath)
+    public function setCertPath(string $certPath)
     {
         $this->setParameter('cert_path', $certPath);
     }
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getKeyPath()
+    public function getKeyPath(): ?string
     {
         return $this->getParameter('key_path');
     }
 
 
     /**
-     * @param mixed $keyPath
+     * @param string $keyPath
      */
-    public function setKeyPath($keyPath)
+    public function setKeyPath(string $keyPath)
     {
         $this->setParameter('key_path', $keyPath);
     }

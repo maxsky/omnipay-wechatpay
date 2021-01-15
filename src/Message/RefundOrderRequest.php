@@ -3,6 +3,7 @@
 namespace Omnipay\WechatPay\Message;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Omnipay\Common\Exception\InvalidRequestException;
 use Omnipay\Common\Message\ResponseInterface;
 use Omnipay\WechatPay\Helper;
@@ -11,7 +12,7 @@ use Omnipay\WechatPay\Helper;
  * Class RefundOrderRequest
  *
  * @package Omnipay\WechatPay\Message
- * @link    https://pay.weixin.qq.com/wiki/doc/api/app.php?chapter=9_4&index=6
+ * @link    https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_4&index=6
  * @method  RefundOrderResponse send()
  */
 class RefundOrderRequest extends BaseAbstractRequest
@@ -22,30 +23,30 @@ class RefundOrderRequest extends BaseAbstractRequest
     /**
      * Get the raw data array for this message. The format of this varies from gateway to
      * gateway, but will usually be either an associative array, or a SimpleXMLElement.
-     * @return mixed
+     *
+     * @return array
      * @throws InvalidRequestException
      */
-    public function getData()
+    public function getData(): array
     {
-        $this->validate('app_id', 'mch_id', 'out_trade_no', 'cert_path', 'key_path');
+        $this->validate('app_id', 'mch_id', 'out_trade_no', 'total_fee', 'refund_fee', 'cert_path', 'key_path');
 
         $data = [
             'appid'           => $this->getAppId(),
             'mch_id'          => $this->getMchId(),
             'sub_appid'       => $this->getSubAppId(),
             'sub_mch_id'      => $this->getSubMchId(),
-            'device_info'     => $this->getDeviceInfo(),//<>
+            'sign_type'       => $this->getSignType(),
             'transaction_id'  => $this->getTransactionId(),
             'out_trade_no'    => $this->getOutTradeNo(),
             'out_refund_no'   => $this->getOutRefundNo(),
             'total_fee'       => $this->getTotalFee(),
             'refund_fee'      => $this->getRefundFee(),
-            'refund_fee_type' => $this->getRefundFee(),//<>
-            'op_user_id'      => $this->getOpUserId() ?: $this->getMchId(),
+            'refund_fee_type' => $this->getRefundType(),//<>
+            'refund_desc'     => $this->getRefundDesc(),
+            'notify_url'      => $this->getNotifyUrl(),
             'nonce_str'       => md5(uniqid()),
         ];
-
-        $data = array_filter($data);
 
         $data['sign'] = Helper::sign($data, $this->getApiKey());
 
@@ -54,86 +55,53 @@ class RefundOrderRequest extends BaseAbstractRequest
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getOutTradeNo()
+    public function getOutTradeNo(): ?string
     {
         return $this->getParameter('out_trade_no');
     }
 
 
     /**
-     * @param mixed $outTradeNo
+     * @param string $outTradeNo
      */
-    public function setOutTradeNo($outTradeNo)
+    public function setOutTradeNo(string $outTradeNo)
     {
         $this->setParameter('out_trade_no', $outTradeNo);
     }
 
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getOpUserId()
-    {
-        return $this->getParameter('op_user_id');
-    }
-
-
-    /**
-     * @param mixed $opUserId
-     */
-    public function setOpUserId($opUserId)
-    {
-        $this->setParameter('op_user_id', $opUserId);
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getOutRefundNo()
+    public function getOutRefundNo(): string
     {
         return $this->getParameter('out_refund_no');
     }
 
 
     /**
-     * @param mixed $outRefundNo
+     * @param string $outRefundNo
      */
-    public function setOutRefundNo($outRefundNo)
+    public function setOutRefundNo(string $outRefundNo)
     {
         $this->setParameter('out_refund_no', $outRefundNo);
     }
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getDeviceInfo()
-    {
-        return $this->getParameter('device_Info');
-    }
-
-
-    /**
-     * @param mixed $deviceInfo
-     */
-    public function setDeviceInfo($deviceInfo)
-    {
-        $this->setParameter('device_Info', $deviceInfo);
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getTransactionId()
+    public function getTransactionId(): ?string
     {
         return $this->getParameter('transaction_id');
     }
 
 
+    /**
+     * @param string $transactionId
+     */
     public function setTransactionId($transactionId)
     {
         $this->setParameter('transaction_id', $transactionId);
@@ -141,16 +109,16 @@ class RefundOrderRequest extends BaseAbstractRequest
 
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getTotalFee()
+    public function getTotalFee(): int
     {
-        return $this->getParameter('total_fee');
+        return (int)$this->getParameter('total_fee');
     }
 
 
     /**
-     * @param mixed $totalFee
+     * @param int|string $totalFee
      */
     public function setTotalFee($totalFee)
     {
@@ -159,16 +127,16 @@ class RefundOrderRequest extends BaseAbstractRequest
 
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getRefundFee()
+    public function getRefundFee(): int
     {
-        return $this->getParameter('refund_fee');
+        return (int)$this->getParameter('refund_fee');
     }
 
 
     /**
-     * @param mixed $refundFee
+     * @param int|string $refundFee
      */
     public function setRefundFee($refundFee)
     {
@@ -177,54 +145,72 @@ class RefundOrderRequest extends BaseAbstractRequest
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getRefundType()
+    public function getRefundType(): ?string
     {
         return $this->getParameter('refund_fee_type');
     }
 
 
     /**
-     * @param mixed $refundFeeType
+     * @param string $refundFeeType
      */
-    public function setRefundType($refundFeeType)
+    public function setRefundType(string $refundFeeType)
     {
         $this->setParameter('refund_fee_type', $refundFeeType);
     }
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getCertPath()
+    public function getRefundDesc(): ?string
+    {
+        return $this->getParameter('refund_desc');
+    }
+
+
+    /**
+     * @param string $refundDesc
+     */
+    public function setRefundDesc(string $refundDesc)
+    {
+        $this->setParameter('refund_desc', $refundDesc);
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getCertPath(): string
     {
         return $this->getParameter('cert_path');
     }
 
 
     /**
-     * @param mixed $certPath
+     * @param string $certPath
      */
-    public function setCertPath($certPath)
+    public function setCertPath(string $certPath)
     {
         $this->setParameter('cert_path', $certPath);
     }
 
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getKeyPath()
+    public function getKeyPath(): string
     {
         return $this->getParameter('key_path');
     }
 
 
     /**
-     * @param mixed $keyPath
+     * @param string $keyPath
      */
-    public function setKeyPath($keyPath)
+    public function setKeyPath(string $keyPath)
     {
         $this->setParameter('key_path', $keyPath);
     }
@@ -233,10 +219,10 @@ class RefundOrderRequest extends BaseAbstractRequest
     /**
      * Send the request with specified data
      *
-     * @param  mixed $data The data to send
+     * @param mixed $data The data to send
      *
      * @return ResponseInterface
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public function sendData($data)
     {
@@ -245,9 +231,9 @@ class RefundOrderRequest extends BaseAbstractRequest
         $client = new Client();
 
         $options = [
-            'body'    => $body,
-            'verify'  => true,
-            'cert'    => $this->getCertPath(),
+            'body' => $body,
+            'verify' => true,
+            'cert' => $this->getCertPath(),
             'ssl_key' => $this->getKeyPath(),
         ];
 

@@ -2,13 +2,28 @@
 
 namespace Omnipay\WechatPay;
 
+use Omnipay\Common\Message\{AbstractRequest, NotificationInterface, RequestInterface};
+
 /**
  * Class PosGateway
  * @package Omnipay\WechatPay
+ * @method NotificationInterface acceptNotification(array $options = array())
+ * @method RequestInterface authorize(array $options = array())
+ * @method RequestInterface completeAuthorize(array $options = array())
+ * @method RequestInterface capture(array $options = array())
+ * @method RequestInterface fetchTransaction(array $options = [])
+ * @method RequestInterface void(array $options = array())
+ * @method RequestInterface createCard(array $options = array())
+ * @method RequestInterface updateCard(array $options = array())
+ * @method RequestInterface deleteCard(array $options = array())
  */
 class PosGateway extends BaseAbstractGateway
 {
-    public function getName()
+
+    /**
+     * @return string
+     */
+    public function getName(): string
     {
         return 'WechatPay Pos';
     }
@@ -17,9 +32,9 @@ class PosGateway extends BaseAbstractGateway
     /**
      * @param array $parameters
      *
-     * @return \Omnipay\WechatPay\Message\CreateOrderRequest
+     * @return AbstractRequest
      */
-    public function purchase($parameters = array())
+    public function purchase($parameters = array()): AbstractRequest
     {
         $parameters['trade_type'] = $this->getTradeType();
 
@@ -30,9 +45,9 @@ class PosGateway extends BaseAbstractGateway
     /**
      * @param array $parameters
      *
-     * @return \Omnipay\WechatPay\Message\QueryOpenIdByAuthCodeRequest
+     * @return AbstractRequest
      */
-    public function queryOpenId($parameters = array())
+    public function queryOpenId($parameters = array()): AbstractRequest
     {
         return $this->createRequest('\Omnipay\WechatPay\Message\QueryOpenIdByAuthCodeRequest', $parameters);
     }

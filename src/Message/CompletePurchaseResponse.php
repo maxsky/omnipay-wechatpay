@@ -8,7 +8,6 @@ use Omnipay\Common\Message\AbstractResponse;
  * Class CompletePurchaseResponse
  *
  * @package Omnipay\WechatPay\Message
- * @link    https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_1
  */
 class CompletePurchaseResponse extends AbstractResponse
 {
@@ -16,23 +15,27 @@ class CompletePurchaseResponse extends AbstractResponse
     /**
      * Is the response successful?
      *
-     * @return boolean
+     * @return bool
      */
-    public function isSuccessful()
+    public function isSuccessful(): bool
     {
         return $this->isPaid();
     }
 
-
-    public function isPaid()
+    /**
+     * @return bool
+     */
+    public function isPaid(): bool
     {
         $data = $this->getData();
 
         return $data['paid'];
     }
 
-
-    public function isSignMatch()
+    /**
+     * @return bool
+     */
+    public function isSignMatch(): bool
     {
         $data = $this->getData();
 

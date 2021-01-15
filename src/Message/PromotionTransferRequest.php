@@ -3,6 +3,7 @@
 namespace Omnipay\WechatPay\Message;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Omnipay\Common\Exception\InvalidRequestException;
 use Omnipay\Common\Message\ResponseInterface;
 use Omnipay\WechatPay\Helper;
@@ -22,10 +23,11 @@ class PromotionTransferRequest extends BaseAbstractRequest
     /**
      * Get the raw data array for this message. The format of this varies from gateway to
      * gateway, but will usually be either an associative array, or a SimpleXMLElement.
-     * @return mixed
+     *
+     * @return array
      * @throws InvalidRequestException
      */
-    public function getData()
+    public function getData(): array
     {
         $this->validate('app_id', 'mch_id', 'partner_trade_no', 'cert_path', 'key_path');
 
@@ -43,8 +45,6 @@ class PromotionTransferRequest extends BaseAbstractRequest
             'nonce_str'        => md5(uniqid()),
         );
 
-        $data = array_filter($data);
-
         $data['sign'] = Helper::sign($data, $this->getApiKey());
 
         return $data;
@@ -52,27 +52,27 @@ class PromotionTransferRequest extends BaseAbstractRequest
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getDeviceInfo()
+    public function getDeviceInfo(): ?string
     {
         return $this->getParameter('device_Info');
     }
 
 
     /**
-     * @param mixed $deviceInfo
+     * @param string $deviceInfo
      */
-    public function setDeviceInfo($deviceInfo)
+    public function setDeviceInfo(string $deviceInfo)
     {
         $this->setParameter('device_Info', $deviceInfo);
     }
 
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getPartnerTradeNo()
+    public function getPartnerTradeNo(): string
     {
         return $this->getParameter('partner_trade_no');
     }
@@ -88,70 +88,70 @@ class PromotionTransferRequest extends BaseAbstractRequest
 
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getOpenId()
+    public function getOpenId(): string
     {
         return $this->getParameter('open_id');
     }
 
 
     /**
-     * @param mixed $openId
+     * @param string $openId
      */
-    public function setOpenId($openId)
+    public function setOpenId(string $openId)
     {
         $this->setParameter('open_id', $openId);
     }
 
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getCheckName()
+    public function getCheckName(): string
     {
         return $this->getParameter('check_name');
     }
 
 
     /**
-     * @param mixed $checkName
+     * @param string $checkName
      */
-    public function setCheckName($checkName)
+    public function setCheckName(string $checkName)
     {
         $this->setParameter('check_name', $checkName);
     }
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getReUserName()
+    public function getReUserName(): ?string
     {
         return $this->getParameter('re_user_name');
     }
 
 
     /**
-     * @param mixed $reUserNamme
+     * @param string $reUserName
      */
-    public function setReUserName($reUserName)
+    public function setReUserName(string $reUserName)
     {
         $this->setParameter('re_user_name', $reUserName);
     }
 
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getAmount()
+    public function getAmount(): int
     {
-        return $this->getParameter('amount');
+        return (int)$this->getParameter('amount');
     }
 
 
     /**
-     * @param mixed $amount
+     * @param int|string $amount
      */
     public function setAmount($amount)
     {
@@ -160,72 +160,72 @@ class PromotionTransferRequest extends BaseAbstractRequest
 
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getDesc()
+    public function getDesc(): string
     {
         return $this->getParameter('desc');
     }
 
 
     /**
-     * @param mixed $desc
+     * @param string $desc
      */
-    public function setDesc($desc)
+    public function setDesc(string $desc)
     {
         $this->setParameter('desc', $desc);
     }
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getSpbillCreateIp()
+    public function getSpbillCreateIp(): ?string
     {
         return $this->getParameter('spbill_create_ip');
     }
 
 
     /**
-     * @param mixed $spbill_create_ip
+     * @param string $spbillCreateIp
      */
-    public function setSpbillCreateIp($spbillCreateIp)
+    public function setSpbillCreateIp(string $spbillCreateIp)
     {
         $this->setParameter('spbill_create_ip', $spbillCreateIp);
     }
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getCertPath()
+    public function getCertPath(): ?string
     {
         return $this->getParameter('cert_path');
     }
 
 
     /**
-     * @param mixed $certPath
+     * @param string $certPath
      */
-    public function setCertPath($certPath)
+    public function setCertPath(string $certPath)
     {
         $this->setParameter('cert_path', $certPath);
     }
 
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getKeyPath()
+    public function getKeyPath(): ?string
     {
         return $this->getParameter('key_path');
     }
 
 
     /**
-     * @param mixed $keyPath
+     * @param string $keyPath
      */
-    public function setKeyPath($keyPath)
+    public function setKeyPath(string $keyPath)
     {
         $this->setParameter('key_path', $keyPath);
     }
@@ -234,19 +234,20 @@ class PromotionTransferRequest extends BaseAbstractRequest
     /**
      * Send the request with specified data
      *
-     * @param  mixed $data The data to send
+     * @param mixed $data The data to send
      *
      * @return ResponseInterface
+     * @throws GuzzleException
      */
     public function sendData($data)
     {
-        $body         = Helper::array2xml($data);
+        $body = Helper::array2xml($data);
         $client = new Client();
-        
+
         $options = [
-            'body'    => $body,
-            'verify'  => true,
-            'cert'    => $this->getCertPath(),
+            'body' => $body,
+            'verify' => true,
+            'cert' => $this->getCertPath(),
             'ssl_key' => $this->getKeyPath(),
         ];
         $response = $client->request('POST', $this->endpoint, $options)->getBody();

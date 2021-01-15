@@ -21,7 +21,8 @@ class CloseOrderRequest extends BaseAbstractRequest
     /**
      * Get the raw data array for this message. The format of this varies from gateway to
      * gateway, but will usually be either an associative array, or a SimpleXMLElement.
-     * @return mixed
+     *
+     * @return array
      * @throws InvalidRequestException
      */
     public function getData()
@@ -37,8 +38,6 @@ class CloseOrderRequest extends BaseAbstractRequest
             'nonce_str'    => md5(uniqid()),
         );
 
-        $data = array_filter($data);
-
         $data['sign'] = Helper::sign($data, $this->getApiKey());
 
         return $data;
@@ -46,18 +45,18 @@ class CloseOrderRequest extends BaseAbstractRequest
 
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getOutTradeNo()
+    public function getOutTradeNo(): string
     {
         return $this->getParameter('out_trade_no');
     }
 
 
     /**
-     * @param mixed $outTradeNo
+     * @param string $outTradeNo
      */
-    public function setOutTradeNo($outTradeNo)
+    public function setOutTradeNo(string $outTradeNo)
     {
         $this->setParameter('out_trade_no', $outTradeNo);
     }

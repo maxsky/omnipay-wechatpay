@@ -2,21 +2,34 @@
 
 namespace Omnipay\WechatPay\Message;
 
+use Omnipay\Common\Message\ResponseInterface;
 use Omnipay\WechatPay\Helper;
 
 /**
  * Class CompleteRefundRequest
  *
  * @package Omnipay\WechatPay\Message
- * @link    https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_16&index=10
+ * @link    https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_16&index=11
+ * @method  CompleteRefundResponse send()
  */
 class CompleteRefundRequest extends BaseAbstractRequest
 {
+
+    /**
+     * @param array|string $requestParams
+     */
     public function setRequestParams($requestParams)
     {
         $this->setParameter('request_params', $requestParams);
     }
 
+    /**
+     * Send the request with specified data
+     *
+     * @param mixed $data The data to send
+     *
+     * @return ResponseInterface
+     */
     public function sendData($data)
     {
         $data = $this->getData();
@@ -66,6 +79,9 @@ class CompleteRefundRequest extends BaseAbstractRequest
     }
 
 
+    /**
+     * @return array|string
+     */
     public function getRequestParams()
     {
         return $this->getParameter('request_params');

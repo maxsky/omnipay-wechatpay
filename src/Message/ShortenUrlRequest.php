@@ -10,7 +10,7 @@ use Omnipay\WechatPay\Helper;
  * Class ShortenUrlRequest
  *
  * @package Omnipay\WechatPay\Message
- * @link    https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_9&index=8
+ * @link    https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_9
  * @method  ShortenUrlResponse send()
  */
 class ShortenUrlRequest extends BaseAbstractRequest
@@ -21,10 +21,11 @@ class ShortenUrlRequest extends BaseAbstractRequest
     /**
      * Get the raw data array for this message. The format of this varies from gateway to
      * gateway, but will usually be either an associative array, or a SimpleXMLElement.
-     * @return mixed
+     *
+     * @return array
      * @throws InvalidRequestException
      */
-    public function getData()
+    public function getData(): array
     {
         $this->validate('app_id', 'mch_id', 'long_url');
 
@@ -33,10 +34,9 @@ class ShortenUrlRequest extends BaseAbstractRequest
             'mch_id'    => $this->getMchId(),
             'sub_mch_id'=> $this->getSubMchId(),
             'long_url'  => $this->getLongUrl(),
+            'sign_type' => $this->getSignType(),
             'nonce_str' => md5(uniqid()),
         );
-
-        $data = array_filter($data);
 
         $data['sign'] = Helper::sign($data, $this->getApiKey());
 
@@ -45,18 +45,18 @@ class ShortenUrlRequest extends BaseAbstractRequest
 
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getLongUrl()
+    public function getLongUrl(): string
     {
         return $this->getParameter('long_url');
     }
 
 
     /**
-     * @param mixed $longUrl
+     * @param string $longUrl
      */
-    public function setLongUrl($longUrl)
+    public function setLongUrl(string $longUrl)
     {
         $this->setParameter('long_url', $longUrl);
     }

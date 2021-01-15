@@ -12,18 +12,18 @@ abstract class BaseAbstractRequest extends AbstractRequest
 {
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getAppId()
+    public function getAppId(): string
     {
         return $this->getParameter('app_id');
     }
 
 
     /**
-     * @param mixed $appId
+     * @param string $appId
      */
-    public function setAppId($appId)
+    public function setAppId(string $appId)
     {
         $this->setParameter('app_id', $appId);
     }
@@ -35,6 +35,15 @@ abstract class BaseAbstractRequest extends AbstractRequest
     public function getApiKey()
     {
         return $this->getParameter('api_key');
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getSignType(): string
+    {
+        return $this->getParameter('sign_type') ?: 'MD5';
     }
 
 
@@ -57,7 +66,7 @@ abstract class BaseAbstractRequest extends AbstractRequest
 
 
     /**
-     * @param mixed $mchId
+     * @param int|string $mchId
      */
     public function setMchId($mchId)
     {
@@ -74,29 +83,38 @@ abstract class BaseAbstractRequest extends AbstractRequest
 
 
     /**
-     * @param mixed $subMchId
+     * @param string $subMchId
      */
-    public function setSubMchId($mchId)
+    public function setSubMchId(string $subMchId)
     {
-        $this->setParameter('sub_mch_id', $mchId);
+        $this->setParameter('sub_mch_id', $subMchId);
     }
 
     /**
      * 子商户 app_id
      *
-     * @return mixed
+     * @return string|null
      */
-    public function getSubAppId()
+    public function getSubAppId(): ?string
     {
         return $this->getParameter('sub_appid');
     }
 
 
     /**
-     * @param mixed $subAppId
+     * @param string $subAppId
      */
-    public function setSubAppId($subAppId)
+    public function setSubAppId(string $subAppId)
     {
         $this->setParameter('sub_appid', $subAppId);
+    }
+
+
+    /**
+     * @param string $signType
+     */
+    public function setSignType(string $signType)
+    {
+        $this->setParameter('sign_type', strtoupper($signType));
     }
 }

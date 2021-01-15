@@ -28,6 +28,11 @@
     }
   },
   "require": {
+    "ext-curl": "*",
+    "ext-json": "*",
+    "ext-libxml": "*",
+    "ext-openssl": "*",
+    "ext-simplexml": "*",
     "omnipay/common": "^3.0",
     "php-http/guzzle6-adapter": "*"
   },

@@ -2,6 +2,7 @@
 
 namespace Omnipay\WechatPay\Message;
 
+use Omnipay\Common\Exception\InvalidRequestException;
 use Omnipay\Common\Message\ResponseInterface;
 use Omnipay\WechatPay\Helper;
 
@@ -21,9 +22,10 @@ class CreateMicroOrderRequest extends CreateOrderRequest
      * Get the raw data array for this message. The format of this varies from gateway to
      * gateway, but will usually be either an associative array, or a SimpleXMLElement.
      *
-     * @return mixed
+     * @return array
+     * @throws InvalidRequestException
      */
-    public function getData()
+    public function getData(): array
     {
         $this->validate('app_id', 'mch_id', 'body', 'out_trade_no', 'total_fee', 'auth_code');
 
@@ -32,6 +34,8 @@ class CreateMicroOrderRequest extends CreateOrderRequest
             'mch_id'           => $this->getMchId(),
             'sub_mch_id'       => $this->getSubMchId(),
             'device_info'      => $this->getDeviceInfo(),//*
+            'nonce_str'        => md5(uniqid()),//*
+            'sign_type'        => $this->getSignType(),
             'body'             => $this->getBody(),//*
             'detail'           => $this->getDetail(),
             'attach'           => $this->getAttach(),
@@ -41,11 +45,12 @@ class CreateMicroOrderRequest extends CreateOrderRequest
             'spbill_create_ip' => $this->getSpbillCreateIp(),//*
             'goods_tag'        => $this->getGoodsTag(),
             'limit_pay'        => $this->getLimitPay(),
+            'time_start'       => $this->getTimeStart(),
+            'time_expire'      => $this->getTimeExpire(),
+            'receipt'          => $this->getReceipt(),
             'auth_code'        => $this->getAuthCode(),//*
-            'nonce_str'        => md5(uniqid()),//*
+            'profit_sharing'   => $this->getProfitSharing()
         );
-
-        $data = array_filter($data);
 
         $data['sign'] = Helper::sign($data, $this->getApiKey());
 
@@ -54,15 +59,18 @@ class CreateMicroOrderRequest extends CreateOrderRequest
 
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getAuthCode()
+    public function getAuthCode(): string
     {
         return $this->getParameter('auth_code');
     }
 
 
-    public function setAuthCode($authCode)
+    /**
+     * @param string $authCode
+     */
+    public function setAuthCode(string $authCode)
     {
         $this->setParameter('auth_code', $authCode);
     }
@@ -71,14 +79,14 @@ class CreateMicroOrderRequest extends CreateOrderRequest
     /**
      * Send the request with specified data
      *
-     * @param  mixed $data The data to send
+     * @param mixed $data The data to send
      *
      * @return ResponseInterface
      */
     public function sendData($data)
     {
-        $request      = $this->httpClient->request('POST', $this->endpoint, [], Helper::array2xml($data));
-        $response     = $request->getBody();
+        $request = $this->httpClient->request('POST', $this->endpoint, [], Helper::array2xml($data));
+        $response = $request->getBody();
         $responseData = Helper::xml2array($response);
 
         return $this->response = new CreateOrderResponse($this, $responseData);
